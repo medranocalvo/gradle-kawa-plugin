@@ -1,8 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.simple">
-  <application
-      android:label="simple"
-      android:name="SampleApplication">
+  <application android:label="simple">
     <activity
         android:name=".SimpleActivity"
         android:label="simple">

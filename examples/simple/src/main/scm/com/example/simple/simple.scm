@@ -1,4 +1,4 @@
-(define-library (com example simple)
+(define-library (com example simple simple)
   (import
     ;; Android
     (class android.app Activity)
@@ -6,5 +6,6 @@
     ;; Scheme
     (scheme base)
     (kawa base))
+  (export SimpleActivity)
   (begin
     (define-simple-class SimpleActivity (Activity))))
