@@ -1,0 +1,72 @@
+/*
+ * Change these to fit your environment.
+ */
+ext {
+    androidBuildToolsVersion = '23.0.1'
+    androidCompileSdkVersion = 17
+    /*
+     * NOTE: Change path to suit your setup.
+     */
+    kawaJar = files('/usr/share/java/kawa.jar')
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        /* Add Android build system. */
+        classpath 'com.android.tools.build:gradle:1.5.0'
+        /* Add the buildscript's dependency. */
+        classpath "com.medranocalvo.gradle:gradle-kawa-plugin:0.8"
+    }
+}
+
+/* Apply the Kawa Android plugin. */
+apply plugin: 'com.android.application'
+apply plugin: "com.medranocalvo.gradle.gradle-android-kawa-plugin"
+
+dependencies {
+    /* Add path to kawa.jar. */
+    compile kawaJar
+}
+
+/* General Kawa configuration. */
+kawa {
+    language 'scheme'
+}
+
+android {
+    buildToolsVersion androidBuildToolsVersion
+    compileSdkVersion androidCompileSdkVersion
+    sourceSets {
+        main {
+            /* We may configureDefault path is src/main/scm. */
+            kawa {
+                srcDir "./some/other/path"
+            }
+        }
+    }
+
+    /*
+     * Android Kawa configuration.  Here we enable inlining for the Android
+     * project.
+     */
+    kawa {
+        inline true
+    }
+
+    buildTypes {
+        debug {
+            /*
+             * BuildType-specific Kawa configuration.  Here we disable inlining
+             * for debug builds, overriding the android configuration.
+             */
+            kawa {
+                inline false
+            }
+        }
+    }
+}
+

@@ -1,0 +1,21 @@
+apply plugin: 'groovy'
+apply plugin: "maven-publish"
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile "com.android.tools.build:gradle:${androidToolsVersion}"
+}
+
+/* Install to local maven repository. */
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
