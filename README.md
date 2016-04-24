@@ -16,6 +16,12 @@ Applying the `com.medranocalvo.gradle.gradle-android-kawa-plugin` plugin does th
 - Add a KawaCompile task for each variant, that takes care of compiling the scheme sources associated to the variant's sourceSet.
 - Add a KawaOptions extensions to each buildType and productFlavor, allowing configuring the Kawa compile task for each of them.
 
+## Installation
+
+To install latest release, follow instructions at https://plugins.gradle.org/plugin/com.medranocalvo.gradle.gradle-kawa-plugin or https://plugins.gradle.org/plugin/com.medranocalvo.gradle.gradle-android-kawa-plugin.
+
+To use the master version, clone the repository and run `./gradlew publishToMavenLocal`.  Then, in the Kawa project's build script enable the maven local repository `buildscript.repositories.mavenLocal()`.
+
 ## Configuration
 
 ### KawaCompile

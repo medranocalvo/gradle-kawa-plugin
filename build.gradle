@@ -1,4 +1,9 @@
+plugins {
+    id "com.gradle.plugin-publish" version "0.9.4"
+}
+
 apply plugin: 'groovy'
+apply plugin: "com.gradle.plugin-publish"
 apply plugin: "maven-publish"
 
 repositories {
@@ -16,6 +21,26 @@ publishing {
     publications {
         maven(MavenPublication) {
             from components.java
+        }
+    }
+}
+
+/* Publish to plugins.gradle.org. */
+pluginBundle {
+    website = wwwURI
+    vcsUrl = scmURI
+    plugins {
+        gradleKawaPlugin {
+            id = gradleKawaPluginId
+            displayName = gradleKawaPluginDisplayName
+            description = gradleKawaPluginDescription
+            tags = ['kawa']
+        }
+        gradleAndroidKawaPlugin {
+            id = gradleAndroidKawaPluginId
+            displayName = gradleAndroidKawaPluginDisplayName
+            description = gradleAndroidKawaPluginDescription
+            tags = ['kawa', 'android']
         }
     }
 }
