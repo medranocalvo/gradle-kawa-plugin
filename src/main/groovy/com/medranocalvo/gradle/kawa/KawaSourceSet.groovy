@@ -70,6 +70,7 @@ class KawaSourceDirectorySetFactory {
     private final FileResolver fileResolver
     private final ProjectInternal project
     private final Class sourceDirectorySetFactoryClass
+    private final static Logger logger = Logging.getLogger(KawaSourceDirectorySetFactory)
     KawaSourceDirectorySetFactory(ProjectInternal project, FileResolver fileResolver) {
         this.fileResolver = fileResolver
         this.project = project
@@ -77,7 +78,7 @@ class KawaSourceDirectorySetFactory {
             sourceDirectorySetFactoryClass =
                 "org.gradle.api.internal.file.SourceDirectorySetFactory" as Class
         } catch (Exception e) {
-            println e.toString()
+            this.logger.debug("Falling back to DefaultSourceDirectorySet: ${e.toString()}")
         }
     }
     DefaultSourceDirectorySet create(String name) {
