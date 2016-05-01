@@ -2,12 +2,12 @@
 
 A Gradle plugin to build [Kawa][kawa] projects.  Integrates with the Android Plugin for Gradle, easing use of Kawa in Android projects.
 
-Applying the `com.medranocalvo.gradle.gradle-kawa-plugin` plugin does the following:
+Applying the `${gradleKawaPluginId}` plugin does the following:
 
 - Add the `KawaCompile` task type.
 - Add a `KawaOptions` extension to the project.
 
-Applying the `com.medranocalvo.gradle.gradle-android-kawa-plugin` plugin does the following:
+Applying the `${gradleAndroidKawaPluginId}` plugin does the following:
 
 - Add a Kawa sourceSet for each variant.
 - Add a task of type `KawaCompile` to each variant, taking care of compiling the scheme sources associated to the variant's sourceSets.
@@ -15,7 +15,7 @@ Applying the `com.medranocalvo.gradle.gradle-android-kawa-plugin` plugin does th
 
 ## Supported versions
 
-Gradle versions `2.8`, `2.9`, `2.10`, `2.11`, `2.12` and `2.13`; and Android Plugin for Gradle versions `1.5.0` and `2.0.0` have been tested.  May your versions be missing, please [let us know](#improvements-and-issues).
+Gradle versions <% print to_sentence(supportedGradleVersions.collect { "`${it}`" }) %>; and Android Plugin for Gradle versions <% print to_sentence(supportedAndroidPluginVersions.collect { "`${it}`" }) %> have been tested.  May your versions be missing, please [let us know](#improvements-and-issues).
 
 ## Installation
 
@@ -24,7 +24,7 @@ Place one of the following snippets after the `buildscript` block in the `build.
 ~~~{.groovy}
 /* File: build.gradle */
 plugins {
-    id "com.medranocalvo.gradle.gradle-kawa-plugin" version "0.8"
+    id "${gradleKawaPluginId}" version "${version}"
 }
 ~~~
 
@@ -33,20 +33,20 @@ or
 ~~~{.groovy}
 /* File: build.gradle */
 plugins {
-    id "com.medranocalvo.gradle.gradle-android-kawa-plugin" version "0.8"
+    id "${gradleAndroidKawaPluginId}" version "${version}"
 }
 ~~~
 
-For older Gradle versions, please follow instructions at either of https://plugins.gradle.org/plugin/com.medranocalvo.gradle.gradle-kawa-plugin https://plugins.gradle.org/plugin/com.medranocalvo.gradle.gradle-android-kawa-plugin.
+For older Gradle versions, please follow instructions at either of https://plugins.gradle.org/plugin/${gradleKawaPluginId} https://plugins.gradle.org/plugin/${gradleAndroidKawaPluginId}.
 
 ### Development version
 
 Unreleased versions can be used by cloning the repository and installing to the local Maven repository:
 
 ~~~{.bash}
-$ git clone https://github.com/medranocalvo/gradle-kawa-plugin gradle-kawa-plugin
-$ cd gradle-kawa-plugin
-$ ./gradlew publishToMavenLocal
+\$ git clone ${scmURI} ${name}
+\$ cd ${name}
+\$ ./gradlew publishToMavenLocal
 ~~~
 
 Make sure to enable the local Maven repository in the projects using the unreleased version:
@@ -81,11 +81,11 @@ configuring the corresponding `KawaCompile` property:
 
 ### Conventions
 
-The `com.medranocalvo.gradle.gradle-kawa-plugin` provides the `KawaCompile` task.  No conventions for regular Kawa projects are implemented yet.
+The `${gradleKawaPluginId}` provides the `KawaCompile` task.  No conventions for regular Kawa projects are implemented yet.
 
 ### Android conventions
 
-The `com.medranocalvo.gradle.gradle-android-kawa-plugin` uses the following conventions:
+The `${gradleAndroidKawaPluginId}` uses the following conventions:
 
 - Kawa compilation can be configured with the `build`, `android`, `buildType`
   and `productFlavor` levels, via the `KawaOptions` extension named `kawa`.  See the [example projects][examples] for details.

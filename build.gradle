@@ -76,3 +76,4 @@ task wrapper(type: Wrapper) {
 }
 
 apply from: "$rootDir/gradle/testing.gradle"
+apply from: "$rootDir/gradle/doc.gradle"

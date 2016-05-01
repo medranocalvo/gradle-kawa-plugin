@@ -1,0 +1,73 @@
+/*
+ * Copyright (C) 2016 Adrián Medraño Calvo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
+ *
+ * Written by:
+ *     Adrián Medraño Calvo <adrian@medranocalvo.com>
+ */
+
+/**
+ * A task for updating the README.
+ *
+ * Takes care of updating version information.
+ */
+
+import groovy.text.SimpleTemplateEngine
+
+class RenderTemplateTask extends DefaultTask {
+    @InputFile
+    def File template
+
+    @Input
+    def context = [:]
+
+    @OutputFile
+    def File output
+
+    String group = 'Documentation'
+    String description = 'Render a template'
+
+    @TaskAction
+    void render(IncrementalTaskInputs inputs) {
+        def engine = new SimpleTemplateEngine().createTemplate(template.text)
+        // Don't use context, as it is used for up-to-date checks.
+        def bindings = context.clone()
+        bindings.to_sentence = this.&to_sentence
+        output.write engine.make(bindings).toString()
+    }
+
+    String to_sentence(List<String> elems, String separator = ",", String lastSeparator = "and") {
+       elems.subList(0, elems.size - 1).join("${separator} ") + " " + lastSeparator + " " + elems[elems.size - 1]
+    }
+}
+
+/* Update README.md */
+tasks.create('updateReadme', RenderTemplateTask) {
+    description 'Updates the README.md file, filling it with up-to-date information'
+    template = project.file "admin/README.md.tmpl"
+    output = project.file "README.md"
+    ["name",
+     "version",
+     "scmURI",
+     "gradleKawaPluginId",
+     "gradleAndroidKawaPluginId",
+     "supportedGradleVersions",
+     "supportedAndroidPluginVersions",
+    ].each { prop ->
+        context.put prop, project.properties.get(prop)
+    }
+}
