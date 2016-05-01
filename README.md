@@ -24,7 +24,7 @@ Place one of the following snippets after the `buildscript` block in the `build.
 ~~~{.groovy}
 /* File: build.gradle */
 plugins {
-    id "com.medranocalvo.gradle.gradle-kawa-plugin" version "0.8"
+    id "com.medranocalvo.gradle.gradle-kawa-plugin" version "0.9"
 }
 ~~~
 
@@ -33,7 +33,7 @@ or
 ~~~{.groovy}
 /* File: build.gradle */
 plugins {
-    id "com.medranocalvo.gradle.gradle-android-kawa-plugin" version "0.8"
+    id "com.medranocalvo.gradle.gradle-android-kawa-plugin" version "0.9"
 }
 ~~~
 
