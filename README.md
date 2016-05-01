@@ -15,7 +15,7 @@ Applying the `com.medranocalvo.gradle.gradle-android-kawa-plugin` plugin does th
 
 ## Supported versions
 
-Gradle versions `2.8`, `2.9`, `2.10`, `2.11`, `2.12` and `2.13`; and Android Plugin for Gradle versions `1.5.0` and `2.0.0` have been tested.  May your versions be missing, please [let us know](#improvements-and-issues).
+Gradle versions `2.8`, `2.9`, `2.10`, `2.11`, `2.12` and `2.13`; and Android Plugin for Gradle versions `1.5.0`, `2.0.0` and `2.1.0` have been tested.  May your versions be missing, please [let us know](#improvements-and-issues).
 
 ## Installation
 
