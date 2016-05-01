@@ -48,8 +48,19 @@ class KawaAndroidPlugin implements Plugin<Project> {
     private static final String KAWA_ANDROID_SOURCESET_NAME = "kawa"
     private static final String KAWA_ANDROID_EXTENSION_NAME = "kawa"
     private static final Logger LOGGER = Logging.getLogger(KawaAndroidPlugin)
+    /* Depended upon plugins. */
+    private static final List<String> KAWA_ANDROID_ANDROID_PLUGIN_IDS = [
+        'com.android.application',
+        'android',
+        'com.android.library',
+        'android-library'
+    ]
+
+    /* Whether the plugin has actually been applied prior to project evaluation. */
+    private boolean isApplied = false;
 
     private final FileResolver fileResolver
+
     @Inject
     public KawaAndroidPlugin(FileResolver fileResolver) {
         this.fileResolver = fileResolver
@@ -60,19 +71,23 @@ class KawaAndroidPlugin implements Plugin<Project> {
      */
     @Override
     void apply(Project project) {
-        BasePlugin androidPlugin = getAndroidPlugin(project);
-        if (!androidPlugin) {
-            throw new ProjectConfigurationException(
-                    "Please apply an Android plugin before applying the '${KAWA_ANDROID_PLUGIN_NAME}' plugin.", null)
+        // Apply the base kawa plugin directly, in order to have the top-level
+        // kawa extension object.
+        project.plugins.apply(KawaBasePlugin)
+        KAWA_ANDROID_ANDROID_PLUGIN_IDS.each { androidPluginId ->
+            project.plugins.withId androidPluginId, { androidPlugin ->
+                if (!isApplied) {
+                    apply(project, androidPlugin)
+                } else {
+                    LOGGER.debug "Found plugin ${androidPlugin}, but KawaAndroidPlugin has been already applied";
+                }
+            }
         }
-        apply(project, androidPlugin)
     }
 
     void apply(Project project, BasePlugin androidPlugin) {
-        LOGGER.debug('Applying Kawa plugin')
-        // Apply the base kawa plugin
-        project.plugins.apply(KawaBasePlugin)
-
+        isApplied = true;
+        LOGGER.debug('Applying KawaAndroidPlugin plugin')
         def androidExtension = getAndroidExtension(project)
 
         // Add Kawa extension:
@@ -145,14 +160,8 @@ class KawaAndroidPlugin implements Plugin<Project> {
     /**
      * Retrieve the android plugin.
      */
-    private static final List<String> ANDROID_PLUGIN_IDS = [
-        'com.android.application',
-        'android',
-        'com.android.library',
-        'android-library'
-    ]
     private BasePlugin getAndroidPlugin(project) {
-        return ANDROID_PLUGIN_IDS.collect {
+        return KAWA_ANDROID_ANDROID_PLUGIN_IDS.collect {
             project.plugins.findPlugin(it)
         } .find {
             it != null
