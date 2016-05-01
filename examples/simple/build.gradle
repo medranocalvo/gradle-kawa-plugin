@@ -20,29 +20,50 @@
  *     Adrián Medraño Calvo <adrian@medranocalvo.com>
  */
 
-/*
- * Change these to fit your environment.
- */
-ext {
-    androidBuildToolsVersion = '23.0.1'
-    androidCompileSdkVersion = 17
-    /*
-     * NOTE: Change path to suit your setup.
-     */
-    kawaJar = files('/usr/share/java/kawa.jar')
-}
-
 buildscript {
+    /*
+     * Change these to fit your environment.  They can be provided to gradlew's
+     * command line via the -P parameter, e.g. -PkawaJarPath="/abc/kawa.jar".
+     */
+    project.ext {
+        if (!project.hasProperty('androidBuildToolsVersion')) {
+            project.ext.androidBuildToolsVersion = '23.0.1'
+        }
+        if (!project.hasProperty('androidCompileSdkVersion')) {
+            project.ext.androidCompileSdkVersion = 17
+        }
+        if (!project.hasProperty('kawaJarPath')) {
+            project.ext.kawaJarPath = '/usr/share/java/kawa.jar'
+        }
+        if (!project.hasProperty('androidGradlePluginVersion')) {
+            project.ext.androidGradlePluginVersion = '1.5.0'
+        }
+    }
+
     repositories {
         mavenLocal()
         jcenter()
     }
     dependencies {
         /* Add Android build system. */
-        classpath 'com.android.tools.build:gradle:1.5.0'
-        /* Add the buildscript's dependency. */
-        classpath "com.medranocalvo.gradle:gradle-kawa-plugin:0.8"
+        classpath "com.android.tools.build:gradle:${androidGradlePluginVersion}"
     }
+}
+
+plugins {
+    /*
+     * This plugin is used to override project properties via the command line.
+     * This allows us to change various properties when testing, most
+     * importantly plugin versions and the build directory location
+     * (project.buildDir).
+     */
+    id 'nebula.override' version '3.0.2'
+    /*
+     * Need to use the new plugins script block to get automatic injection of
+     * code under test.  See:
+     * https://docs.gradle.org/current/userguide/test_kit.html#sub:test-kit-classpath-injection
+     */
+    id "com.medranocalvo.gradle.gradle-android-kawa-plugin" version "0.8"
 }
 
 /* Apply the Kawa Android plugin. */
@@ -51,7 +72,7 @@ apply plugin: "com.medranocalvo.gradle.gradle-android-kawa-plugin"
 
 dependencies {
     /* Add path to kawa.jar. */
-    compile kawaJar
+    compile files(kawaJarPath)
 }
 
 /* General Kawa configuration. */
@@ -64,16 +85,20 @@ android {
     compileSdkVersion androidCompileSdkVersion
     sourceSets {
         main {
-            /* We may configureDefault path is src/main/scm. */
             kawa {
-                srcDir "./some/other/path"
+                /*
+                 * Paths where Scheme sources are looked up can be specifyed
+                 * for each source set.  The default path for the 'main' source
+                 * set is "src/main/scm".
+                 */
+                srcDir "src/some/other/path"
             }
         }
     }
 
     /*
-     * Android Kawa configuration.  Here we enable inlining for the Android
-     * project.
+     * Kawa configuration for android.  Enable inlining (it is enabled by
+     * default anyway).
      */
     kawa {
         inline true
@@ -82,8 +107,8 @@ android {
     buildTypes {
         debug {
             /*
-             * BuildType-specific Kawa configuration.  Here we disable inlining
-             * for debug builds, overriding the android configuration.
+             * BuildType-specific Kawa configuration.  Disable inlining for
+             * debug builds, overriding the android configuration.
              */
             kawa {
                 inline false

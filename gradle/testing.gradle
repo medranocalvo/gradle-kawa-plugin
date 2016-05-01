@@ -1,0 +1,108 @@
+/*
+ * Copyright (C) 2016 Adrián Medraño Calvo
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
+ *
+ * Written by:
+ *     Adrián Medraño Calvo <adrian@medranocalvo.com>
+ */
+
+import groovy.json.JsonBuilder
+
+int compareVersions(String v1, String v2) {
+    List<Integer> vn1 = v1.tokenize('.')*.toInteger()
+    List<Integer> vn2 = v2.tokenize('.')*.toInteger()
+    // Fill with 0...
+    int diff = vn1.size - vn2.size;
+    if (diff > 0) {
+        vn2 += [0] * diff;
+    } else if (diff < 0) {
+        vn1 += [0] * -diff;
+    }
+    [vn1, vn2].transpose().findResult(0) {
+        def res = it[0] <=> it[1]
+        // If equal keep checking.
+        res == 0 ? null : res
+    }
+}
+
+void testProperty(task, propertyName, value) {
+    final String TEST_PARAMETERS_PROPERTY_PREFIX = 'com.medranocalvo.gradle.kawa.test.'
+    def json = new JsonBuilder(value).toPrettyString()
+    task.systemProperty(
+        TEST_PARAMETERS_PROPERTY_PREFIX + propertyName,
+        json
+    )
+}
+
+project.ext.examplesDir = file('examples')
+project.ext.supportedGradleVersions = ['2.8', '2.9', '2.10', '2.11', '2.12', '2.13']
+project.ext.supportedAndroidPluginVersions = ['1.5.0', '2.0.0']
+project.ext.supportedVersions = [supportedGradleVersions, supportedAndroidPluginVersions]
+    .combinations ()
+    .collect {
+        [gradleVersion: it[0], androidPluginVersion: it[1]]
+     }
+    .grep { m ->
+        !(compareVersions(m.androidPluginVersion, '2.0.0') >= 0 &&
+          compareVersions(m.gradleVersion, '2.9') <= 0)
+     }
+
+tasks.withType(Test) {
+    /* Use the examples as test projects (or vice-versa...). */
+    group 'Verification'
+    testProperty it, "examplesDir", examplesDir.getAbsolutePath()
+}
+
+/* Add a test task for each Gradle version. */
+supportedVersions
+    .groupBy { it.gradleVersion }
+    .each { gradleVersion, versionCombinations ->
+        def taskName = "testGradle${gradleVersion}";
+        tasks.create(taskName, Test) {
+            testProperty it, "versionCombinations", versionCombinations
+        }
+     }
+
+/* Add a test task for each Android plugin version. */
+supportedVersions
+    .groupBy { it.androidPluginVersion }
+    .each { androidPluginVersion, versionCombinations ->
+        def taskName = "testAndroidPlugin${androidPluginVersion}";
+        tasks.create(taskName, Test) {
+            testProperty it, "versionCombinations", versionCombinations
+        }
+     }
+
+/*
+ * Add a test task for each combination of Gradle and Android Plugin for Gradle
+ * versions.
+ */
+supportedVersions.each { versionCombination ->
+    def gradleVersion = versionCombination.gradleVersion
+    def androidPluginVersion = versionCombination.androidPluginVersion
+    def taskName = "testGradle${gradleVersion}AndroidPlugin${androidPluginVersion}";
+    tasks.create(taskName, Test) {
+        testProperty it, "versionCombinations", [versionCombination]
+    }
+}
+
+/*
+ * By default test every version.
+ */
+test {
+    testProperty it, "versionCombinations", supportedVersions
+}

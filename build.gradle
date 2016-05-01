@@ -25,17 +25,21 @@ plugins {
 }
 
 apply plugin: 'groovy'
-apply plugin: "com.gradle.plugin-publish"
-apply plugin: "maven-publish"
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'com.gradle.plugin-publish'
+apply plugin: 'maven-publish'
 
 repositories {
     jcenter()
 }
 
 dependencies {
-    compile gradleApi()
     compile localGroovy()
     compile "com.android.tools.build:gradle:${androidToolsVersion}"
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+        // Uses old groovy.
+        exclude group: 'org.codehaus.groovy'
+    }
 }
 
 /* Install to local maven repository. */
@@ -70,3 +74,5 @@ pluginBundle {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.13'
 }
+
+apply from: "$rootDir/gradle/testing.gradle"
